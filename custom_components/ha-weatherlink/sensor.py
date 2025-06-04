@@ -20,6 +20,16 @@ SENSOR_TYPES = {
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     sensors = []
+
+    # Guard: Ensure data is present and has "conditions"
+    if not coordinator.data or "conditions" not in coordinator.data:
+        # Optionally log a warning
+        import logging
+        logging.getLogger(__name__).warning(
+            "Weatherlink API did not return 'conditions'. Data: %s", coordinator.data
+        )
+        return
+
     # Find the first outdoor conditions (data_structure_type == 1)
     outdoor = next((c for c in coordinator.data["conditions"] if c.get(
         "data_structure_type") == 1), None)
