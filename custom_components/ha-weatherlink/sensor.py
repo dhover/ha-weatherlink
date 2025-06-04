@@ -78,8 +78,26 @@ class WeatherlinkSensor(SensorEntity):
         return f"{self.coordinator._host}_{self._key}"
 
     @property
+    def device_info(self):
+        # Use the device ID and host from the coordinator data
+        device_id = None
+        if (
+            self.coordinator.data
+            and "data" in self.coordinator.data
+            and "did" in self.coordinator.data["data"]
+        ):
+            device_id = self.coordinator.data["data"]["did"]
+        return {
+            "identifiers": {(DOMAIN, device_id or self.coordinator._host)},
+            "name": "Weatherlink Live",
+            "manufacturer": "Davis Instruments",
+            "model": "Weatherlink Live",
+            "sw_version": None,
+            "configuration_url": f"http://{self.coordinator._host}/",
+        }
+
+    @property
     def native_value(self):
-        # Always get the latest data from the coordinator
         if (
             not self.coordinator.data
             or "data" not in self.coordinator.data
