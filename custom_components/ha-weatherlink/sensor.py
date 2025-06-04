@@ -1,5 +1,6 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.const import UnitOfLength
 from .const import DOMAIN
 
 SENSOR_TYPES = {
@@ -83,7 +84,11 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_unit_of_measurement(self):
-        # Use the API's native units
+        if self.device_class == "precipitation":
+            # Show mm if HA is metric, else inch
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return "mm"
+            return "in"
         if self.device_class == "temperature":
             return "°F"  # Weatherlink API returns Fahrenheit by default
         if self.device_class == "humidity":
@@ -92,8 +97,6 @@ class WeatherlinkSensor(SensorEntity):
             return "inHg"  # Weatherlink API returns inches of mercury
         if self.device_class == "wind_speed":
             return "mph"
-        if self.device_class == "precipitation":
-            return "in"
         return None
 
     @property
@@ -124,6 +127,33 @@ class WeatherlinkSensor(SensorEntity):
             return None
         for cond in self.coordinator.data["data"]["conditions"]:
             if self._key in cond:
+                # Special handling for rainfall_daily
+                if self._key == "rainfall_daily":
+                    rain_size = cond.get("rain_size", 1)
+                    count = cond["rainfall_daily"]
+                    # Determine mm per count
+                    if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                        # Convert to mm
+                        if rain_size == 1:
+                            return round(count * 0.254, 2)  # 0.01 inch to mm
+                        elif rain_size == 2:
+                            return round(count * 0.2, 2)
+                        elif rain_size == 3:
+                            return round(count * 0.1, 2)
+                        elif rain_size == 4:
+                            return round(count * 0.0254, 3)  # 0.001 inch to mm
+                    else:
+                        # Convert to inches
+                        if rain_size == 1:
+                            return round(count * 0.01, 3)
+                        elif rain_size == 2:
+                            return round(count * 0.00787, 3)  # 0.2 mm to inch
+                        elif rain_size == 3:
+                            return round(count * 0.00394, 3)  # 0.1 mm to inch
+                        elif rain_size == 4:
+                            return round(count * 0.001, 3)
+                    # Default fallback
+                    return count
                 return cond[self._key]
         return None
 
