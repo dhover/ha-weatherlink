@@ -2,17 +2,13 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 
-TEMP_FAHRENHEIT = "°F"
-PRESSURE_INHG = "inHg"
-PERCENTAGE = "%"
-
 SENSOR_TYPES = {
-    "temp": ["Outdoor Temperature", TEMP_FAHRENHEIT, "mdi:thermometer"],
-    "hum": ["Outdoor Humidity", PERCENTAGE, "mdi:water-percent"],
-    "dew_point": ["Dew Point", TEMP_FAHRENHEIT, "mdi:weather-fog"],
-    "rainfall_daily": ["Daily Rainfall", "in", "mdi:weather-rainy"],
-    "wind_speed_last": ["Wind Speed", "mph", "mdi:weather-windy"],
-    "bar_sea_level": ["Barometric Pressure", PRESSURE_INHG, "mdi:gauge"],
+    "temp": ["Outdoor Temperature", "temperature", "mdi:thermometer", "measurement"],
+    "hum": ["Outdoor Humidity", "humidity", "mdi:water-percent", "measurement"],
+    "dew_point": ["Dew Point", "temperature", "mdi:weather-fog", "measurement"],
+    "rainfall_daily": ["Daily Rainfall", "precipitation", "mdi:weather-rainy", "total"],
+    "wind_speed_last": ["Wind Speed", "wind_speed", "mdi:weather-windy", "measurement"],
+    "bar_sea_level": ["Barometric Pressure", "pressure", "mdi:gauge", "measurement"],
     # Add more as needed
 }
 
@@ -69,17 +65,39 @@ class WeatherlinkSensor(SensorEntity):
         self._key = key
         self._data = data
         self._attr_name = SENSOR_TYPES.get(key, [key])[0]
+        self._attr_device_class = SENSOR_TYPES.get(key, [None, None, None, None])[1]
         self._attr_icon = SENSOR_TYPES.get(key, [None, None, "mdi:cloud"])[2]
-        self._attr_native_unit_of_measurement = SENSOR_TYPES.get(key, [None, None])[
-            1]
+        self._attr_state_class = SENSOR_TYPES.get(key, [None, None, None, None])[3]
 
     @property
     def unique_id(self):
         return f"{self.coordinator._host}_{self._key}"
 
     @property
+    def device_class(self):
+        return self._attr_device_class
+
+    @property
+    def state_class(self):
+        return self._attr_state_class
+
+    @property
+    def native_unit_of_measurement(self):
+        # Use the API's native units
+        if self.device_class == "temperature":
+            return "°F"  # Weatherlink API returns Fahrenheit by default
+        if self.device_class == "humidity":
+            return "%"   # Relative humidity
+        if self.device_class == "pressure":
+            return "inHg"  # Weatherlink API returns inches of mercury
+        if self.device_class == "wind_speed":
+            return "mph"
+        if self.device_class == "precipitation":
+            return "in"
+        return None
+
+    @property
     def device_info(self):
-        # Use the device ID and host from the coordinator data
         device_id = None
         if (
             self.coordinator.data
