@@ -13,7 +13,8 @@ class WeatherlinkCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=f"{DOMAIN}_coordinator",
-            update_interval=DEFAULT_UPDATE_INTERVAL,  # Set your desired update interval
+            # Set your desired update interval
+            update_interval=timedelta(seconds=DEFAULT_UPDATE_INTERVAL),
         )
         self._api = DavisWeatherlinkApi(host)
         self._host = host
