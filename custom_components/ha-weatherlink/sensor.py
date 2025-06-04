@@ -1,7 +1,10 @@
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import TEMP_FAHRENHEIT, PERCENTAGE, PRESSURE_INHG
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
+
+TEMP_FAHRENHEIT = "°F"
+PRESSURE_INHG = "inHg"
+PERCENTAGE = "%"
 
 SENSOR_TYPES = {
     "temp": ["Outdoor Temperature", TEMP_FAHRENHEIT, "mdi:thermometer"],
