@@ -16,6 +16,7 @@ class WeatherlinkCoordinator(DataUpdateCoordinator):
             update_interval=None,  # Set your desired update interval
         )
         self._api = DavisWeatherlinkApi(host)
+        self._host = host
 
     async def _async_update_data(self):
         try:
