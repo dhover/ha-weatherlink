@@ -1,6 +1,7 @@
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, DEFAULT_UPDATE_INTERVAL
+from datetime import timedelta
 from .davis import DavisWeatherlinkApi
 import logging
 
