@@ -8,6 +8,7 @@ SENSOR_TYPES = {
     "hum": ["Outdoor Humidity", "humidity", "mdi:water-percent", "measurement"],
     "dew_point": ["Dew Point", "temperature", "mdi:weather-fog", "measurement"],
     "rainfall_daily": ["Daily Rainfall", "precipitation", "mdi:weather-rainy", "total"],
+    "rainfall_year": ["Yearly Rainfall", "precipitation", "mdi:weather-rainy", "total"],
     "wind_speed_last": ["Wind Speed", "wind_speed", "mdi:weather-windy", "measurement"],
     "bar_sea_level": ["Barometric Pressure", "pressure", "mdi:gauge", "measurement"],
     # Add more as needed
@@ -43,7 +44,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     # Outdoor sensors
     if outdoor:
-        for key in ["temp", "hum", "dew_point", "rainfall_daily", "wind_speed_last"]:
+        for key in ["temp", "hum", "dew_point", "rainfall_daily", "rainfall_year", "wind_speed_last"]:
             if key in outdoor:
                 sensors.append(WeatherlinkSensor(coordinator, key, outdoor))
     # Indoor sensors
@@ -66,9 +67,11 @@ class WeatherlinkSensor(SensorEntity):
         self._key = key
         self._data = data
         self._attr_name = SENSOR_TYPES.get(key, [key])[0]
-        self._attr_device_class = SENSOR_TYPES.get(key, [None, None, None, None])[1]
+        self._attr_device_class = SENSOR_TYPES.get(
+            key, [None, None, None, None])[1]
         self._attr_icon = SENSOR_TYPES.get(key, [None, None, "mdi:cloud"])[2]
-        self._attr_state_class = SENSOR_TYPES.get(key, [None, None, None, None])[3]
+        self._attr_state_class = SENSOR_TYPES.get(
+            key, [None, None, None, None])[3]
 
     @property
     def unique_id(self):
@@ -125,12 +128,25 @@ class WeatherlinkSensor(SensorEntity):
             or "conditions" not in self.coordinator.data["data"]
         ):
             return None
+
+        rain_count_keys = {
+            "rainfall_daily",
+            "rainfall_year",
+            "rainfall_monthly",
+            "rainfall_last_15_min",
+            "rainfall_last_60_min",
+            "rainfall_last_24_hr",
+            "rain_storm",
+            "rain_storm_last",
+            # Add more rain count fields if needed
+        }
+
         for cond in self.coordinator.data["data"]["conditions"]:
             if self._key in cond:
-                # Special handling for rainfall_daily
-                if self._key == "rainfall_daily":
+                # Special handling for all rain count fields
+                if self._key in rain_count_keys:
                     rain_size = cond.get("rain_size", 1)
-                    count = cond["rainfall_daily"]
+                    count = cond[self._key]
                     # Determine mm per count
                     if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                         # Convert to mm
