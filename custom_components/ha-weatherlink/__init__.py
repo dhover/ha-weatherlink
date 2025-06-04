@@ -1,5 +1,6 @@
-from .sensor import WeatherlinkSensor
 from .const import DOMAIN
+
+PLATFORMS = ["sensor"]
 
 
 async def async_setup(hass, config):
@@ -8,12 +9,12 @@ async def async_setup(hass, config):
 
 
 async def async_setup_entry(hass, entry):
-    hass.data[DOMAIN][entry.entry_id] = WeatherlinkSensor(hass, entry)
-    await hass.data[DOMAIN][entry.entry_id].async_setup()
+    # Forward the config entry setup to the sensor platform
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass, entry):
-    await hass.data[DOMAIN][entry.entry_id].async_unload()
-    del hass.data[DOMAIN][entry.entry_id]
+    # Unload the sensor platform
+    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     return True
