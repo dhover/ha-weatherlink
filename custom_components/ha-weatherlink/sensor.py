@@ -22,20 +22,26 @@ async def async_setup_entry(hass, entry, async_add_entities):
     sensors = []
 
     # Guard: Ensure data is present and has "conditions"
-    if not coordinator.data or "conditions" not in coordinator.data:
-        # Optionally log a warning
+    if (
+        not coordinator.data
+        or "data" not in coordinator.data
+        or "conditions" not in coordinator.data["data"]
+    ):
         import logging
         logging.getLogger(__name__).warning(
-            "Weatherlink API did not return 'conditions'. Data: %s", coordinator.data
+            "Weatherlink API did not return 'data.conditions'. Data: %s", coordinator.data
         )
         return
 
+    # Use the correct path to conditions
+    conditions = coordinator.data["data"]["conditions"]
+
     # Find the first outdoor conditions (data_structure_type == 1)
-    outdoor = next((c for c in coordinator.data["conditions"] if c.get(
+    outdoor = next((c for c in conditions if c.get(
         "data_structure_type") == 1), None)
-    indoor = next((c for c in coordinator.data["conditions"] if c.get(
+    indoor = next((c for c in conditions if c.get(
         "data_structure_type") == 4), None)
-    bar = next((c for c in coordinator.data["conditions"] if c.get(
+    bar = next((c for c in conditions if c.get(
         "data_structure_type") == 3), None)
 
     # Outdoor sensors
@@ -74,7 +80,13 @@ class WeatherlinkSensor(SensorEntity):
     @property
     def native_value(self):
         # Always get the latest data from the coordinator
-        for cond in self.coordinator.data["conditions"]:
+        if (
+            not self.coordinator.data
+            or "data" not in self.coordinator.data
+            or "conditions" not in self.coordinator.data["data"]
+        ):
+            return None
+        for cond in self.coordinator.data["data"]["conditions"]:
             if self._key in cond:
                 return cond[self._key]
         return None
