@@ -71,12 +71,16 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     conditions = coordinator.data["data"]["conditions"]
 
-    # Add all sensors for each condition block, but skip those with value None, "Unknown", or null
+    # Create a separate device for each condition object
     for cond in conditions:
+        # Use a unique device_id for each condition (e.g., lsid or txid)
+        device_id = cond.get("lsid") or cond.get("txid") or id(cond)
         for key in SENSOR_TYPES:
             value = cond.get(key)
             if value not in (None, "Unknown", "null"):
-                sensors.append(WeatherlinkSensor(coordinator, key, cond))
+                sensors.append(
+                    WeatherlinkSensor(coordinator, key, cond, device_id)
+                )
 
     async_add_entities(sensors)
 
@@ -84,10 +88,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class WeatherlinkSensor(SensorEntity):
     has_entity_name = True
 
-    def __init__(self, coordinator, key, data):
+    def __init__(self, coordinator, key, data, device_id=None):
         self.coordinator = coordinator
         self._key = key
         self._data = data
+        self._device_id = device_id
         self._attr_name = SENSOR_TYPES.get(key, [key])[0]
         self._attr_device_class = SENSOR_TYPES.get(
             key, [None, None, None, None])[1]
@@ -97,7 +102,8 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def unique_id(self):
-        return f"{self.coordinator._host}_{self._key}"
+        # Make unique per device/condition
+        return f"{self.coordinator._host}_{self._device_id}_{self._key}"
 
     @property
     def device_class(self):
@@ -112,8 +118,12 @@ class WeatherlinkSensor(SensorEntity):
         if self.device_class == "precipitation":
             # Show mm if HA is metric, else inch
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return UnitOfLength.MILLIMETERS
+                return "UnitOfLength.MILLIMETERS"
             return UnitOfLength.INCHES
+        if self.device_class == "precipitation_intensity":
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return "UnitOfLength.MILLIMETERS/h"
+            return "UnitOfLength.INCHES/h"
         if self.device_class == "temperature":
             # Weatherlink API returns Fahrenheit by default
             return UnitOfTemperature.FAHRENHEIT
@@ -143,16 +153,12 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def device_info(self):
-        device_id = None
-        if (
-            self.coordinator.data
-            and "data" in self.coordinator.data
-            and "did" in self.coordinator.data["data"]
-        ):
-            device_id = self.coordinator.data["data"]["did"]
+        # Each condition object gets its own device
+        device_id = self._device_id or self.coordinator._host
+        name = f"Weatherlink Device {device_id}"
         return {
-            "identifiers": {(DOMAIN, device_id or self.coordinator._host)},
-            "name": "Weatherlink Live",
+            "identifiers": {(DOMAIN, device_id)},
+            "name": name,
             "manufacturer": "Davis Instruments",
             "model": "Weatherlink Live",
             "sw_version": None,
