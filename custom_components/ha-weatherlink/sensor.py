@@ -1,6 +1,6 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.const import UnitOfLength
+from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfPressure, UnitOfSpeed
 from .const import DOMAIN
 
 SENSOR_TYPES = {
@@ -92,16 +92,17 @@ class WeatherlinkSensor(SensorEntity):
         if self.device_class == "precipitation":
             # Show mm if HA is metric, else inch
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return "mm"
-            return "in"
+                return UnitOfLength.MILLIMETERS
+            return UnitOfLength.INCHES
         if self.device_class == "temperature":
-            return "°F"  # Weatherlink API returns Fahrenheit by default
+            # Weatherlink API returns Fahrenheit by default
+            return UnitOfTemperature.FAHRENHEIT
         if self.device_class == "humidity":
-            return "%"   # Relative humidity
+            return "%"                          # Relative humidity
         if self.device_class == "pressure":
-            return "inHg"  # Weatherlink API returns inches of mercury
+            return UnitOfPressure.INHG          # Weatherlink API returns inches of mercury
         if self.device_class == "wind_speed":
-            return "mph"
+            return UnitOfSpeed.MILES_PER_HOUR   # Weatherlink API returns mph
         return None
 
     @property
