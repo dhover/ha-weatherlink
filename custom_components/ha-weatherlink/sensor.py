@@ -9,8 +9,47 @@ SENSOR_TYPES = {
     "dew_point": ["Dew Point", "temperature", "mdi:weather-fog", "measurement"],
     "rainfall_daily": ["Daily Rainfall", "precipitation", "mdi:weather-rainy", "total"],
     "rainfall_year": ["Yearly Rainfall", "precipitation", "mdi:weather-rainy", "total"],
+    "rainfall_monthly": ["Monthly Rainfall", "precipitation", "mdi:weather-rainy", "total"],
+    "rainfall_last_15_min": ["Rainfall Last 15 Min", "precipitation", "mdi:weather-rainy", "total"],
+    "rainfall_last_60_min": ["Rainfall Last 60 Min", "precipitation", "mdi:weather-rainy", "total"],
+    "rainfall_last_24_hr": ["Rainfall Last 24 Hr", "precipitation", "mdi:weather-rainy", "total"],
+    "rain_storm": ["Current Storm Rainfall", "precipitation", "mdi:weather-pouring", "total"],
+    "rain_storm_last": ["Last Storm Rainfall", "precipitation", "mdi:weather-pouring", "total"],
     "wind_speed_last": ["Wind Speed", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_last": ["Wind Direction", "wind_direction", "mdi:compass", None],
+    "wind_speed_avg_last_1_min": ["Wind Speed Avg 1 Min", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_scalar_avg_last_1_min": ["Wind Dir Scalar Avg 1 Min", "wind_direction", "mdi:compass", None],
+    "wind_speed_avg_last_2_min": ["Wind Speed Avg 2 Min", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_scalar_avg_last_2_min": ["Wind Dir Scalar Avg 2 Min", "wind_direction", "mdi:compass", None],
+    "wind_speed_hi_last_2_min": ["Wind Speed Hi 2 Min", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_at_hi_speed_last_2_min": ["Wind Dir at Hi Speed 2 Min", "wind_direction", "mdi:compass", None],
+    "wind_speed_avg_last_10_min": ["Wind Speed Avg 10 Min", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_scalar_avg_last_10_min": ["Wind Dir Scalar Avg 10 Min", "wind_direction", "mdi:compass", None],
+    "wind_speed_hi_last_10_min": ["Wind Speed Hi 10 Min", "wind_speed", "mdi:weather-windy", "measurement"],
+    "wind_dir_at_hi_speed_last_10_min": ["Wind Dir at Hi Speed 10 Min", "wind_direction", "mdi:compass", None],
     "bar_sea_level": ["Barometric Pressure", "pressure", "mdi:gauge", "measurement"],
+    "bar_trend": ["Barometric Trend", None, "mdi:trending-up", None],
+    "bar_absolute": ["Absolute Pressure", "pressure", "mdi:gauge", "measurement"],
+    "temp_in": ["Indoor Temperature", "temperature", "mdi:thermometer", "measurement"],
+    "hum_in": ["Indoor Humidity", "humidity", "mdi:water-percent", "measurement"],
+    "dew_point_in": ["Indoor Dew Point", "temperature", "mdi:weather-fog", "measurement"],
+    "heat_index": ["Heat Index", "temperature", "mdi:thermometer", "measurement"],
+    "heat_index_in": ["Indoor Heat Index", "temperature", "mdi:thermometer", "measurement"],
+    "wind_chill": ["Wind Chill", "temperature", "mdi:snowflake", "measurement"],
+    "solar_rad": ["Solar Radiation", "illuminance", "mdi:white-balance-sunny", "measurement"],
+    "uv_index": ["UV Index", "uv_index", "mdi:weather-sunny-alert", "measurement"],
+    "wet_bulb": ["Wet Bulb", "temperature", "mdi:thermometer-water", "measurement"],
+    "thw_index": ["THW Index", "temperature", "mdi:thermometer", "measurement"],
+    "thsw_index": ["THSW Index", "temperature", "mdi:thermometer", "measurement"],
+    "rx_state": ["Receiver State", None, "mdi:radio-tower", None],
+    "trans_battery_flag": ["Transmitter Battery Flag", None, "mdi:battery-alert", None],
+    "rain_size": ["Rain Collector Size", None, "mdi:cup-water", None],
+    "rain_rate_last": ["Rain Rate Last", "precipitation_intensity", "mdi:weather-pouring", "measurement"],
+    "rain_rate_hi": ["Rain Rate High", "precipitation_intensity", "mdi:weather-pouring", "measurement"],
+    "rain_rate_hi_last_15_min": ["Rain Rate Hi Last 15 Min", "precipitation_intensity", "mdi:weather-pouring", "measurement"],
+    "rain_storm_start_at": ["Rain Storm Start", None, "mdi:clock-start", None],
+    "rain_storm_last_start_at": ["Last Rain Storm Start", None, "mdi:clock-start", None],
+    "rain_storm_last_end_at": ["Last Rain Storm End", None, "mdi:clock-end", None],
     # Add more as needed
 }
 
@@ -19,7 +58,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     sensors = []
 
-    # Guard: Ensure data is present and has "conditions"
     if (
         not coordinator.data
         or "data" not in coordinator.data
@@ -31,32 +69,13 @@ async def async_setup_entry(hass, entry, async_add_entities):
         )
         return
 
-    # Use the correct path to conditions
     conditions = coordinator.data["data"]["conditions"]
 
-    # Find the first outdoor conditions (data_structure_type == 1)
-    outdoor = next((c for c in conditions if c.get(
-        "data_structure_type") == 1), None)
-    indoor = next((c for c in conditions if c.get(
-        "data_structure_type") == 4), None)
-    bar = next((c for c in conditions if c.get(
-        "data_structure_type") == 3), None)
-
-    # Outdoor sensors
-    if outdoor:
-        for key in ["temp", "hum", "dew_point", "rainfall_daily", "rainfall_year", "wind_speed_last"]:
-            if key in outdoor:
-                sensors.append(WeatherlinkSensor(coordinator, key, outdoor))
-    # Indoor sensors
-    if indoor:
-        for key in ["temp_in", "hum_in", "dew_point_in"]:
-            if key in indoor:
-                sensors.append(WeatherlinkSensor(coordinator, key, indoor))
-    # Barometric sensors
-    if bar:
-        for key in ["bar_sea_level"]:
-            if key in bar:
-                sensors.append(WeatherlinkSensor(coordinator, key, bar))
+    # Add all sensors for each condition block, but skip those with value None
+    for cond in conditions:
+        for key in SENSOR_TYPES:
+            if key in cond and cond[key] is not None:
+                sensors.append(WeatherlinkSensor(coordinator, key, cond))
 
     async_add_entities(sensors)
 
@@ -198,3 +217,9 @@ class WeatherlinkSensor(SensorEntity):
     @property
     def available(self):
         return self.coordinator.last_update_success
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "native_unit_of_measurement": self.native_unit_of_measurement,
+        }
