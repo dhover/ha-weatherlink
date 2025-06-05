@@ -62,6 +62,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 
 class WeatherlinkSensor(SensorEntity):
+    has_entity_name = True
+
     def __init__(self, coordinator, key, data):
         self.coordinator = coordinator
         self._key = key
