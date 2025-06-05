@@ -105,6 +105,22 @@ class WeatherlinkSensor(SensorEntity):
         return None
 
     @property
+    def suggested_display_precision(self):
+        if self.device_class == "precipitation":
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return 1
+            return 2
+        if self.device_class == "temperature":
+            return 1
+        if self.device_class == "humidity":
+            return 1
+        if self.device_class == "pressure":
+            return 1
+        if self.device_class == "wind_speed":
+            return 1
+        return None
+
+    @property
     def device_info(self):
         device_id = None
         if (
