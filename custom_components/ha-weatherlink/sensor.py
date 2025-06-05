@@ -71,11 +71,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     conditions = coordinator.data["data"]["conditions"]
 
-    # Add all sensors for each condition block, but skip those with value None or "Unknown"
+    # Add all sensors for each condition block, but skip those with value None, "Unknown", or null
     for cond in conditions:
         for key in SENSOR_TYPES:
             value = cond.get(key)
-            if value is not None and value != "Unknown":
+            if value not in (None, "Unknown", "null"):
                 sensors.append(WeatherlinkSensor(coordinator, key, cond))
 
     async_add_entities(sensors)
