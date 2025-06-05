@@ -167,13 +167,6 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_value(self):
-        if (
-            not self.coordinator.data
-            or "data" not in self.coordinator.data
-            or "conditions" not in self.coordinator.data["data"]
-        ):
-            return None
-
         rain_count_keys = {
             "rainfall_daily",
             "rainfall_year",
@@ -186,36 +179,31 @@ class WeatherlinkSensor(SensorEntity):
             # Add more rain count fields if needed
         }
 
-        for cond in self.coordinator.data["data"]["conditions"]:
-            if self._key in cond:
-                # Special handling for all rain count fields
-                if self._key in rain_count_keys:
-                    rain_size = cond.get("rain_size", 1)
-                    count = cond[self._key]
-                    # Determine mm per count
-                    if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                        # Convert to mm
-                        if rain_size == 1:
-                            return round(count * 0.254, 2)  # 0.01 inch to mm
-                        elif rain_size == 2:
-                            return round(count * 0.2, 2)
-                        elif rain_size == 3:
-                            return round(count * 0.1, 2)
-                        elif rain_size == 4:
-                            return round(count * 0.0254, 3)  # 0.001 inch to mm
-                    else:
-                        # Convert to inches
-                        if rain_size == 1:
-                            return round(count * 0.01, 3)
-                        elif rain_size == 2:
-                            return round(count * 0.00787, 3)  # 0.2 mm to inch
-                        elif rain_size == 3:
-                            return round(count * 0.00394, 3)  # 0.1 mm to inch
-                        elif rain_size == 4:
-                            return round(count * 0.001, 3)
-                    # Default fallback
-                    return count
-                return cond[self._key]
+        if self._key in self._data:
+            # Special handling for all rain count fields
+            if self._key in rain_count_keys:
+                rain_size = self._data.get("rain_size", 1)
+                count = self._data[self._key]
+                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                    if rain_size == 1:
+                        return round(count * 0.254, 2)  # 0.01 inch to mm
+                    elif rain_size == 2:
+                        return round(count * 0.2, 2)
+                    elif rain_size == 3:
+                        return round(count * 0.1, 2)
+                    elif rain_size == 4:
+                        return round(count * 0.0254, 3)  # 0.001 inch to mm
+                else:
+                    if rain_size == 1:
+                        return round(count * 0.01, 3)
+                    elif rain_size == 2:
+                        return round(count * 0.00787, 3)  # 0.2 mm to inch
+                    elif rain_size == 3:
+                        return round(count * 0.00394, 3)  # 0.1 mm to inch
+                    elif rain_size == 4:
+                        return round(count * 0.001, 3)
+                return count
+            return self._data[self._key]
         return None
 
     async def async_update(self):
