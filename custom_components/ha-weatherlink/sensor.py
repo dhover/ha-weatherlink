@@ -122,8 +122,8 @@ class WeatherlinkSensor(SensorEntity):
             return UnitOfLength.INCHES
         if self.device_class == "precipitation_intensity":
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return "UnitOfLength.MILLIMETERS/h"
-            return "UnitOfLength.INCHES/h"
+                return f"{UnitOfLength.MILLIMETERS}/h"
+            return f"{UnitOfLength.INCHES}/h"
         if self.device_class == "temperature":
             # Weatherlink API returns Fahrenheit by default
             return UnitOfTemperature.FAHRENHEIT
