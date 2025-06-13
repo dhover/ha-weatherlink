@@ -4,71 +4,461 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 
 SENSOR_TYPES = {
-    "bar_sea_level": ["Barometric Pressure", "pressure", "mdi:gauge", SensorStateClass.MEASUREMENT],
-    "bar_trend": ["Barometric Trend", None, "mdi:trending-up", None],
-    "bar_absolute": ["Absolute Pressure", "pressure", "mdi:gauge", SensorStateClass.MEASUREMENT],
-    "dew_point": ["Dew Point", "temperature", "mdi:weather-fog", SensorStateClass.MEASUREMENT],
-    "dew_point_in": ["Indoor Dew Point", "temperature", "mdi:weather-fog", SensorStateClass.MEASUREMENT],
-    "heat_index": ["Heat Index", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "heat_index_in": ["Indoor Heat Index", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "hum": ["Outdoor Humidity", "humidity", "mdi:water-percent", SensorStateClass.MEASUREMENT],
-    "hum_in": ["Indoor Humidity", "humidity", "mdi:water-percent", SensorStateClass.MEASUREMENT],
-    "last_report_time": ["Time Last Report", None, None, None],
-    "pm_1_last": ["PM 1.0 Last", SensorDeviceClass.PM1, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5_last": ["PM 2.5 Last", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_10_last": ["PM 10 Last", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pm_1": ["PM 1.0", SensorDeviceClass.PM1, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5": ["PM 2.5", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5_last_1_hour": ["PM 2.5 Last 1h", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5_last_3_hours": ["PM 2.5 Last 3h", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5_last_24_hours": ["PM 2.5 Last 24h", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_2p5_nowcast": ["PM 2.5 Nowcast", SensorDeviceClass.PM25, None, SensorStateClass.MEASUREMENT],
-    "pm_10": ["PM 10", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pm_10_last_1_hour": ["PM 10 Last 1h", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pm_10_last_3_hours": ["PM 10 Last 3h", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pm_10_last_24_hours": ["PM 10 Last 24h", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pm_10_nowcast": ["PM 10 Nowcast", SensorDeviceClass.PM10, None, SensorStateClass.MEASUREMENT],
-    "pct_pm_data_last_1_hour": ["PM Data Last 1h", None, None, SensorStateClass.MEASUREMENT],
-    "pct_pm_data_last_3_hours": ["PM Data Last 3h", None, None, SensorStateClass.MEASUREMENT],
-    "pct_pm_data_last_24_hours": ["PM Data Last 24h", None, None, SensorStateClass.MEASUREMENT],
-    "pct_pm_data_nowcast": ["PM Data Nowcast", None, None, SensorStateClass.MEASUREMENT],
-    "rainfall_daily": ["Daily Rainfall", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rainfall_last_15_min": ["Rainfall Last 15 Min", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rainfall_last_60_min": ["Rainfall Last 60 Min", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rainfall_last_24_hr": ["Rainfall Last 24 Hr", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rainfall_monthly": ["Monthly Rainfall", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rainfall_year": ["Yearly Rainfall", "precipitation", "mdi:weather-rainy", SensorStateClass.TOTAL],
-    "rain_rate_hi": ["Rain Rate High", "precipitation_intensity", "mdi:weather-pouring", SensorStateClass.MEASUREMENT],
-    "rain_rate_hi_last_15_min": ["Rain Rate Hi Last 15 Min", "precipitation_intensity", "mdi:weather-pouring", SensorStateClass.MEASUREMENT],
-    "rain_rate_last": ["Rain Rate Last", "precipitation_intensity", "mdi:weather-pouring", SensorStateClass.MEASUREMENT],
-    "rain_size": ["Rain Collector Size", None, "mdi:cup-water", None],
-    "rain_storm": ["Current Storm Rainfall", "precipitation", "mdi:weather-pouring", SensorStateClass.TOTAL],
-    "rain_storm_last": ["Last Storm Rainfall", "precipitation", "mdi:weather-pouring", SensorStateClass.TOTAL],
-    "rain_storm_last_end_at": ["Last Rain Storm End", None, "mdi:clock-end", None],
-    "rain_storm_last_start_at": ["Last Rain Storm Start", None, "mdi:clock-start", None],
-    "rain_storm_start_at": ["Rain Storm Start", None, "mdi:clock-start", None],
-    "rx_state": ["Receiver State", None, "mdi:radio-tower", None],
-    "solar_rad": ["Solar Radiation", "illuminance", "mdi:white-balance-sunny", SensorStateClass.MEASUREMENT],
-    "temp": ["Outdoor Temperature", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "temp_in": ["Indoor Temperature", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "thsw_index": ["THSW Index", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "thw_index": ["THW Index", "temperature", "mdi:thermometer", SensorStateClass.MEASUREMENT],
-    "trans_battery_flag": ["Transmitter Battery Flag", None, "mdi:battery-alert", None],
-    "uv_index": ["UV Index", "uv_index", "mdi:weather-sunny-alert", SensorStateClass.MEASUREMENT],
-    "wet_bulb": ["Wet Bulb", "temperature", "mdi:thermometer-water", SensorStateClass.MEASUREMENT],
-    "wind_speed_last": ["Wind Speed", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_last": ["Wind Direction", "wind_direction", "mdi:compass", None],
-    "wind_speed_avg_last_1_min": ["Wind Speed Avg 1 Min", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_scalar_avg_last_1_min": ["Wind Dir Scalar Avg 1 Min", "wind_direction", "mdi:compass", None],
-    "wind_speed_avg_last_2_min": ["Wind Speed Avg 2 Min", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_scalar_avg_last_2_min": ["Wind Dir Scalar Avg 2 Min", "wind_direction", "mdi:compass", None],
-    "wind_speed_hi_last_2_min": ["Wind Speed Hi 2 Min", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_at_hi_speed_last_2_min": ["Wind Dir at Hi Speed 2 Min", "wind_direction", "mdi:compass", None],
-    "wind_speed_avg_last_10_min": ["Wind Speed Avg 10 Min", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_scalar_avg_last_10_min": ["Wind Dir Scalar Avg 10 Min", "wind_direction", "mdi:compass", None],
-    "wind_speed_hi_last_10_min": ["Wind Speed Hi 10 Min", "wind_speed", "mdi:weather-windy", SensorStateClass.MEASUREMENT],
-    "wind_dir_at_hi_speed_last_10_min": ["Wind Dir at Hi Speed 10 Min", "wind_direction", "mdi:compass", None],
-    "wind_chill": ["Wind Chill", "temperature", "mdi:snowflake", SensorStateClass.MEASUREMENT],
+    "bar_sea_level": {
+        "name": "Barometric Pressure",
+        "device_class": "pressure",
+        "icon": "mdi:gauge",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfPressure.INHG,
+    },
+    "bar_trend": {
+        "name": "Barometric Trend",
+        "device_class": None,
+        "icon": "mdi:trending-up",
+        "state_class": None,
+        "unit": None,
+    },
+    "bar_absolute": {
+        "name": "Absolute Pressure",
+        "device_class": "pressure",
+        "icon": "mdi:gauge",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfPressure.INHG,
+    },
+    "dew_point": {
+        "name": "Dew Point",
+        "device_class": "temperature",
+        "icon": "mdi:weather-fog",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "dew_point_in": {
+        "name": "Indoor Dew Point",
+        "device_class": "temperature",
+        "icon": "mdi:weather-fog",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "heat_index": {
+        "name": "Heat Index",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "heat_index_in": {
+        "name": "Indoor Heat Index",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "hum": {
+        "name": "Outdoor Humidity",
+        "device_class": "humidity",
+        "icon": "mdi:water-percent",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "hum_in": {
+        "name": "Indoor Humidity",
+        "device_class": "humidity",
+        "icon": "mdi:water-percent",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "last_report_time": {
+        "name": "Time Last Report",
+        "device_class": None,
+        "icon": None,
+        "state_class": None,
+        "unit": None,
+    },
+    "pm_1_last": {
+        "name": "PM 1.0 Last",
+        "device_class": SensorDeviceClass.PM1,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5_last": {
+        "name": "PM 2.5 Last",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10_last": {
+        "name": "PM 10 Last",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_1": {
+        "name": "PM 1.0",
+        "device_class": SensorDeviceClass.PM1,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5": {
+        "name": "PM 2.5",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5_last_1_hour": {
+        "name": "PM 2.5 Last 1h",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5_last_3_hours": {
+        "name": "PM 2.5 Last 3h",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5_last_24_hours": {
+        "name": "PM 2.5 Last 24h",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_2p5_nowcast": {
+        "name": "PM 2.5 Nowcast",
+        "device_class": SensorDeviceClass.PM25,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10": {
+        "name": "PM 10",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10_last_1_hour": {
+        "name": "PM 10 Last 1h",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10_last_3_hours": {
+        "name": "PM 10 Last 3h",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10_last_24_hours": {
+        "name": "PM 10 Last 24h",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pm_10_nowcast": {
+        "name": "PM 10 Nowcast",
+        "device_class": SensorDeviceClass.PM10,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    },
+    "pct_pm_data_last_1_hour": {
+        "name": "PM Data Last 1h",
+        "device_class": None,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "pct_pm_data_last_3_hours": {
+        "name": "PM Data Last 3h",
+        "device_class": None,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "pct_pm_data_last_24_hours": {
+        "name": "PM Data Last 24h",
+        "device_class": None,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "pct_pm_data_nowcast": {
+        "name": "PM Data Nowcast",
+        "device_class": None,
+        "icon": None,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "%",
+    },
+    "rainfall_daily": {
+        "name": "Daily Rainfall",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rainfall_last_15_min": {
+        "name": "Rainfall Last 15 Min",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rainfall_last_60_min": {
+        "name": "Rainfall Last 60 Min",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rainfall_last_24_hr": {
+        "name": "Rainfall Last 24 Hr",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rainfall_monthly": {
+        "name": "Monthly Rainfall",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rainfall_year": {
+        "name": "Yearly Rainfall",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-rainy",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rain_rate_hi": {
+        "name": "Rain Rate High",
+        "device_class": "precipitation_intensity",
+        "icon": "mdi:weather-pouring",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": f"{UnitOfLength.INCHES}/h",
+    },
+    "rain_rate_hi_last_15_min": {
+        "name": "Rain Rate Hi Last 15 Min",
+        "device_class": "precipitation_intensity",
+        "icon": "mdi:weather-pouring",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": f"{UnitOfLength.INCHES}/h",
+    },
+    "rain_rate_last": {
+        "name": "Rain Rate Last",
+        "device_class": "precipitation_intensity",
+        "icon": "mdi:weather-pouring",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": f"{UnitOfLength.INCHES}/h",
+    },
+    "rain_size": {
+        "name": "Rain Collector Size",
+        "device_class": None,
+        "icon": "mdi:cup-water",
+        "state_class": None,
+        "unit": None,
+    },
+    "rain_storm": {
+        "name": "Current Storm Rainfall",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-pouring",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rain_storm_last": {
+        "name": "Last Storm Rainfall",
+        "device_class": "precipitation",
+        "icon": "mdi:weather-pouring",
+        "state_class": SensorStateClass.TOTAL,
+        "unit": UnitOfLength.INCHES,
+    },
+    "rain_storm_last_end_at": {
+        "name": "Last Rain Storm End",
+        "device_class": None,
+        "icon": "mdi:clock-end",
+        "state_class": None,
+        "unit": None,
+    },
+    "rain_storm_last_start_at": {
+        "name": "Last Rain Storm Start",
+        "device_class": None,
+        "icon": "mdi:clock-start",
+        "state_class": None,
+        "unit": None,
+    },
+    "rain_storm_start_at": {
+        "name": "Rain Storm Start",
+        "device_class": None,
+        "icon": "mdi:clock-start",
+        "state_class": None,
+        "unit": None,
+    },
+    "rx_state": {
+        "name": "Receiver State",
+        "device_class": None,
+        "icon": "mdi:radio-tower",
+        "state_class": None,
+        "unit": None,
+    },
+    "solar_rad": {
+        "name": "Solar Radiation",
+        "device_class": "illuminance",
+        "icon": "mdi:white-balance-sunny",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": "W/m²",
+    },
+    "temp": {
+        "name": "Outdoor Temperature",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "temp_in": {
+        "name": "Indoor Temperature",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "thsw_index": {
+        "name": "THSW Index",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "thw_index": {
+        "name": "THW Index",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "trans_battery_flag": {
+        "name": "Transmitter Battery Flag",
+        "device_class": None,
+        "icon": "mdi:battery-alert",
+        "state_class": None,
+        "unit": None,
+    },
+    "uv_index": {
+        "name": "UV Index",
+        "device_class": "uv_index",
+        "icon": "mdi:weather-sunny-alert",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": None,
+    },
+    "wet_bulb": {
+        "name": "Wet Bulb",
+        "device_class": "temperature",
+        "icon": "mdi:thermometer-water",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
+    "wind_speed_last": {
+        "name": "Wind Speed",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_last": {
+        "name": "Wind Direction",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_speed_avg_last_1_min": {
+        "name": "Wind Speed Avg 1 Min",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_scalar_avg_last_1_min": {
+        "name": "Wind Dir Scalar Avg 1 Min",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_speed_avg_last_2_min": {
+        "name": "Wind Speed Avg 2 Min",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_scalar_avg_last_2_min": {
+        "name": "Wind Dir Scalar Avg 2 Min",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_speed_hi_last_2_min": {
+        "name": "Wind Speed Hi 2 Min",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_at_hi_speed_last_2_min": {
+        "name": "Wind Dir at Hi Speed 2 Min",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_speed_avg_last_10_min": {
+        "name": "Wind Speed Avg 10 Min",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_scalar_avg_last_10_min": {
+        "name": "Wind Dir Scalar Avg 10 Min",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_speed_hi_last_10_min": {
+        "name": "Wind Speed Hi 10 Min",
+        "device_class": "wind_speed",
+        "icon": "mdi:weather-windy",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfSpeed.MILES_PER_HOUR,
+    },
+    "wind_dir_at_hi_speed_last_10_min": {
+        "name": "Wind Dir at Hi Speed 10 Min",
+        "device_class": "wind_direction",
+        "icon": "mdi:compass",
+        "state_class": None,
+        "unit": "°",
+    },
+    "wind_chill": {
+        "name": "Wind Chill",
+        "device_class": "temperature",
+        "icon": "mdi:snowflake",
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit": UnitOfTemperature.FAHRENHEIT,
+    },
 }
 
 rain_count_keys = {
@@ -123,12 +513,12 @@ class WeatherlinkSensor(SensorEntity):
         self._key = key
         self._data = data
         self._device_id = device_id
-        self._attr_name = SENSOR_TYPES.get(key, [key])[0]
-        self._attr_device_class = SENSOR_TYPES.get(
-            key, [None, None, None, None])[1]
-        self._attr_icon = SENSOR_TYPES.get(key, [None, None, "mdi:cloud"])[2]
-        self._attr_state_class = SENSOR_TYPES.get(
-            key, [None, None, None, None])[3]
+        sensor_info = SENSOR_TYPES.get(key, {})
+        self._attr_name = sensor_info.get("name", key)
+        self._attr_device_class = sensor_info.get("device_class")
+        self._attr_icon = sensor_info.get("icon", "mdi:cloud")
+        self._attr_state_class = sensor_info.get("state_class")
+        self._attr_unit = sensor_info.get("unit")
 
     @property
     def unique_id(self):
@@ -145,24 +535,10 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_unit_of_measurement(self):
-        if self.device_class == "precipitation":
-            # Show mm if HA is metric, else inch
-            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return "UnitOfLength.MILLIMETERS"
-            return UnitOfLength.INCHES
-        if self.device_class == "precipitation_intensity":
-            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return f"{UnitOfLength.MILLIMETERS}/h"
-            return f"{UnitOfLength.INCHES}/h"
-        if self.device_class == "temperature":
-            # Weatherlink API returns Fahrenheit by default
-            return UnitOfTemperature.FAHRENHEIT
-        if self.device_class == "humidity":
-            return "%"                          # Relative humidity
-        if self.device_class == "pressure":
-            return UnitOfPressure.INHG          # Weatherlink API returns inches of mercury
-        if self.device_class == "wind_speed":
-            return UnitOfSpeed.MILES_PER_HOUR   # Weatherlink API returns mph
+        # Prefer the unit from SENSOR_TYPES, but allow dynamic logic for rain/temperature if needed
+        if self._attr_unit is not None:
+            return self._attr_unit
+        # fallback logic if needed
         return None
 
     @property
