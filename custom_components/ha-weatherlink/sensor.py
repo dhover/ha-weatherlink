@@ -1,5 +1,5 @@
 from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfPressure, UnitOfSpeed, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
-from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass
+from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass, SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 
