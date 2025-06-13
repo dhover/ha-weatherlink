@@ -626,20 +626,25 @@ class WeatherlinkSensor(SensorEntity):
         txid = self._data.get("txid", 0)
         if data_structure_type == 1:
             name = f"ISS{txid}"
+            model = "Weatherlink Live"
         elif data_structure_type == 3:
             name = f"WLL Baro"
+            model = "Weatherlink Live"
         elif data_structure_type == 4:
             name = f"WLL Temp/Hum"
+            model = "Weatherlink Live"
         elif data_structure_type == 6:
             name = f"Airlink"
+            model = "Airlink"
         else:
             name = f"Weatherlink Device {device_id}"
+            model = "Weatherlink Live"
 
         return {
             "identifiers": {(DOMAIN, device_id)},
             "name": name,
             "manufacturer": "Davis Instruments",
-            "model": "Weatherlink Live",
+            "model": {model},
             "sw_version": None,
             "configuration_url": f"http://{self.coordinator._host}/",
         }
@@ -723,13 +728,13 @@ def calculate_rain_size(rain_size):
 
 def calculate_rain_size_unit(rain_size):
     if rain_size == 1:
-        return "inch"
+        return UnitOfLength.INCHES
     elif rain_size == 2:
-        return "mm"
+        return UnitOfLength.MILLIMETERS
     elif rain_size == 3:
-        return "mm"
+        return UnitOfLength.MILLIMETERS
     elif rain_size == 4:
-        return "inch"
+        return UnitOfLength.INCHES
 
 
 def calculate_rain_amount(count, rain_size, to_mm):
