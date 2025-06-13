@@ -612,8 +612,8 @@ class WeatherlinkSensor(SensorEntity):
             return 1
         # if self.device_class == SensorDeviceClass.HUMIDITY:
         #    return 1
-        # if self.device_class == SensorDeviceClass.PRESSURE:
-        #    return 1
+        if self.device_class == SensorDeviceClass.PRESSURE:
+            return 1
         if self.device_class == SensorDeviceClass.WIND_SPEED:
             return 1
         return None
