@@ -609,28 +609,11 @@ class WeatherlinkSensor(SensorEntity):
             if self._key in rain_count_keys:
                 rain_size = self._data.get("rain_size", 1)
                 count = self._data[self._key]
-                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                    if rain_size == 1:
-                        return round(count * 0.254, 2)  # 0.01 inch to mm
-                    elif rain_size == 2:
-                        return round(count * 0.2, 2)
-                    elif rain_size == 3:
-                        return round(count * 0.1, 2)
-                    elif rain_size == 4:
-                        return round(count * 0.0254, 3)  # 0.001 inch to mm
-                else:
-                    if rain_size == 1:
-                        return round(count * 0.01, 3)
-                    elif rain_size == 2:
-                        return round(count * 0.00787, 3)  # 0.2 mm to inch
-                    elif rain_size == 3:
-                        return round(count * 0.00394, 3)  # 0.1 mm to inch
-                    elif rain_size == 4:
-                        return round(count * 0.001, 3)
-                return count
+                to_mm = self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS
+                return calculate_rain_amount(count, rain_size, to_mm)
             # Convert temperature sensors to Celsius
-            # if self.device_class == "temperature":
-            #    return round(fahrenheit_to_celsius(self._data[self._key]), 1)
+            if self.device_class == "temperature":
+                return round(fahrenheit_to_celsius(self._data[self._key]), 1)
             return self._data[self._key]
         return None
 
@@ -653,3 +636,26 @@ def fahrenheit_to_celsius(f):
     if f is None:
         return None
     return (f - 32) * 5.0 / 9.0
+
+
+def calculate_rain_amount(count, rain_size, to_mm):
+    """Calculate rain amount based on count, rain_size, and target unit."""
+    if to_mm:
+        if rain_size == 1:
+            return round(count * 0.254, 2)  # 0.01 inch to mm
+        elif rain_size == 2:
+            return round(count * 0.2, 2)
+        elif rain_size == 3:
+            return round(count * 0.1, 2)
+        elif rain_size == 4:
+            return round(count * 0.0254, 3)  # 0.001 inch to mm
+    else:
+        if rain_size == 1:
+            return round(count * 0.01, 3)
+        elif rain_size == 2:
+            return round(count * 0.00787, 3)  # 0.2 mm to inch
+        elif rain_size == 3:
+            return round(count * 0.00394, 3)  # 0.1 mm to inch
+        elif rain_size == 4:
+            return round(count * 0.001, 3)
+    return count
