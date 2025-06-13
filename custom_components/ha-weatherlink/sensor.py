@@ -580,30 +580,30 @@ class WeatherlinkSensor(SensorEntity):
         }
 
     @property
-    def native_value(self):
-        @property
-        def native_unit_of_measurement(self):
-            if self.device_class == "precipitation":
-                # Show mm if HA is metric, else inch
-                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                    return UnitOfLength.MILLIMETERS
-                return UnitOfLength.INCHES
-            if self.device_class == "precipitation_intensity":
-                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                    return f"{UnitOfLength.MILLIMETERS}/h"
-                return f"{UnitOfLength.INCHES}/h"
-            if self.device_class == "temperature":
-                return UnitOfTemperature.FAHRENHEIT
-            if self.device_class == "humidity":
-                return "%"
-            if self.device_class == "pressure":
-                return UnitOfPressure.INHG
-            if self.device_class == "wind_speed":
-                return UnitOfSpeed.MILES_PER_HOUR
-            if self.device_class in ["pm1", "pm25", "pm10"]:
-                return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
-            return None
+    def native_unit_of_measurement(self):
+        if self.device_class == "precipitation":
+            # Show mm if HA is metric, else inch
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return UnitOfLength.MILLIMETERS
+            return UnitOfLength.INCHES
+        if self.device_class == "precipitation_intensity":
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return f"{UnitOfLength.MILLIMETERS}/h"
+            return f"{UnitOfLength.INCHES}/h"
+        if self.device_class == "temperature":
+            return UnitOfTemperature.FAHRENHEIT
+        if self.device_class == "humidity":
+            return "%"
+        if self.device_class == "pressure":
+            return UnitOfPressure.INHG
+        if self.device_class == "wind_speed":
+            return UnitOfSpeed.MILES_PER_HOUR
+        if self.device_class in ["pm1", "pm25", "pm10"]:
+            return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
+        return None
 
+    @property
+    def native_value(self):
         if self._key in self._data:
             # Special handling for all rain count fields
             if self._key in rain_count_keys:
@@ -628,6 +628,9 @@ class WeatherlinkSensor(SensorEntity):
                     elif rain_size == 4:
                         return round(count * 0.001, 3)
                 return count
+            # Convert temperature sensors to Celsius
+            # if self.device_class == "temperature":
+            #    return round(fahrenheit_to_celsius(self._data[self._key]), 1)
             return self._data[self._key]
         return None
 
@@ -643,3 +646,10 @@ class WeatherlinkSensor(SensorEntity):
         return {
             "native_unit_of_measurement": self.native_unit_of_measurement,
         }
+
+
+def fahrenheit_to_celsius(f):
+    """Convert Fahrenheit to Celsius."""
+    if f is None:
+        return None
+    return (f - 32) * 5.0 / 9.0

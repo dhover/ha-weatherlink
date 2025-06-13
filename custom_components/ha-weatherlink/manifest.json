@@ -12,6 +12,7 @@
   "iot_class": "local_polling",
   "config_flow": true,
   "zeroconf": [
-    "_weatherlinklive._tcp.local."
+    "_weatherlinklive._tcp.local.",
+    "_airlink._tcp.local."
   ]
 }
