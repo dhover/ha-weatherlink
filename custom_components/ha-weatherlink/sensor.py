@@ -654,10 +654,16 @@ class WeatherlinkSensor(SensorEntity):
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
+        if self._key == "rain_size":
+            rain_size = self._data.get("rain_size", 1)
+            return calculate_rain_size_unit(rain_size)
         return self._attr_unit
 
     @property
     def native_value(self):
+        if self._key == "rain_size":
+            rain_size = self._data.get("rain_size", 1)
+            return calculate_rain_size(rain_size)
         if self._key in self._data:
             if self._key in rain_count_keys:
                 rain_size = self._data.get("rain_size", 1)
@@ -702,6 +708,28 @@ def fahrenheit_to_celsius(f):
     if f is None:
         return None
     return (f - 32) * 5.0 / 9.0
+
+
+def calculate_rain_size(rain_size):
+    if rain_size == 1:
+        return 0.01
+    elif rain_size == 2:
+        return 0.2
+    elif rain_size == 3:
+        return 0.1
+    elif rain_size == 4:
+        return 0.001
+
+
+def calculate_rain_size_unit(rain_size):
+    if rain_size == 1:
+        return "inch"
+    elif rain_size == 2:
+        return "mm"
+    elif rain_size == 3:
+        return "mm"
+    elif rain_size == 4:
+        return "inch"
 
 
 def calculate_rain_amount(count, rain_size, to_mm):
