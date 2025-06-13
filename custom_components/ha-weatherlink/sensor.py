@@ -622,7 +622,7 @@ class WeatherlinkSensor(SensorEntity):
     def device_info(self):
         # Each condition object gets its own device
         device_id = self._device_id or self.coordinator._host
-        data_structure_type = data.get("data_structure_type", 0)
+        data_structure_type = self._data.get("data_structure_type", 0)
         if data_structure_type == 1:
             name = f"ISS {device_id}"
         elif data_structure_type == 3:
