@@ -588,9 +588,9 @@ class WeatherlinkSensor(SensorEntity):
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
-        if self.device_class == SensorDeviceClass.WIND_SPEED:
-            return UnitOfSpeed.MILES_PER_HOUR
-        return None
+        # if self.device_class == SensorDeviceClass.WIND_SPEED:
+        #    return UnitOfSpeed.MILES_PER_HOUR
+        return self._attr_unit
 
     @property
     def native_value(self):
