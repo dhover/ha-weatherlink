@@ -53,6 +53,18 @@ SENSOR_TYPES = {
     # Add more as needed
 }
 
+rain_count_keys = {
+    "rainfall_daily",
+    "rainfall_year",
+    "rainfall_monthly",
+    "rainfall_last_15_min",
+    "rainfall_last_60_min",
+    "rainfall_last_24_hr",
+    "rain_storm",
+    "rain_storm_last",
+    # Add more rain count fields if needed
+}
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
@@ -167,17 +179,26 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_value(self):
-        rain_count_keys = {
-            "rainfall_daily",
-            "rainfall_year",
-            "rainfall_monthly",
-            "rainfall_last_15_min",
-            "rainfall_last_60_min",
-            "rainfall_last_24_hr",
-            "rain_storm",
-            "rain_storm_last",
-            # Add more rain count fields if needed
-        }
+        @property
+        def native_unit_of_measurement(self):
+            if self.device_class == "precipitation":
+                # Show mm if HA is metric, else inch
+                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                    return UnitOfLength.MILLIMETERS
+                return UnitOfLength.INCHES
+            if self.device_class == "precipitation_intensity":
+                if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                    return f"{UnitOfLength.MILLIMETERS}/h"
+                return f"{UnitOfLength.INCHES}/h"
+            if self.device_class == "temperature":
+                return UnitOfTemperature.FAHRENHEIT
+            if self.device_class == "humidity":
+                return "%"
+            if self.device_class == "pressure":
+                return UnitOfPressure.INHG
+            if self.device_class == "wind_speed":
+                return UnitOfSpeed.MILES_PER_HOUR
+            return None
 
         if self._key in self._data:
             # Special handling for all rain count fields
