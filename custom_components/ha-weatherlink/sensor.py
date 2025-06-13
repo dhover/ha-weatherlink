@@ -1,7 +1,7 @@
 from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfPressure, UnitOfSpeed, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass, SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from datetime import datetime
+from datetime import datetime, timezone
 from .const import DOMAIN
 
 SENSOR_TYPES = {
@@ -588,14 +588,15 @@ class WeatherlinkSensor(SensorEntity):
                 return round(fahrenheit_to_celsius(self._data[self._key]), 1)
             if self.device_class == SensorDeviceClass.TIMESTAMP:
                 value = self._data[self._key]
-                # Try to convert from epoch seconds or ISO string
+                # Convert to timezone-aware datetime in UTC
                 if isinstance(value, (int, float)):
-                    # Assume epoch seconds
-                    return datetime.fromtimestamp(value)
+                    return datetime.fromtimestamp(value, tz=timezone.utc)
                 if isinstance(value, str):
                     try:
-                        # Try ISO format
-                        return datetime.fromisoformat(value)
+                        dt = datetime.fromisoformat(value)
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        return dt
                     except Exception:
                         return value
                 return value
