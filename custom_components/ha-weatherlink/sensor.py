@@ -543,16 +543,8 @@ class WeatherlinkSensor(SensorEntity):
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
-        if self.device_class == SensorDeviceClass.TEMPERATURE:
-            return UnitOfTemperature.FAHRENHEIT
-        if self.device_class == SensorDeviceClass.HUMIDITY:
-            return "%"
-        if self.device_class == SensorDeviceClass.PRESSURE:
-            return UnitOfPressure.INHG
         if self.device_class == SensorDeviceClass.WIND_SPEED:
             return UnitOfSpeed.MILES_PER_HOUR
-        if self.device_class in [SensorDeviceClass.PM1, SensorDeviceClass.PM25, SensorDeviceClass.PM10]:
-            return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
         return None
 
     @property
@@ -561,12 +553,12 @@ class WeatherlinkSensor(SensorEntity):
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return 1
             return 2
-        if self.device_class == SensorDeviceClass.TEMPERATURE:
-            return 1
-        if self.device_class == SensorDeviceClass.HUMIDITY:
-            return 1
-        if self.device_class == SensorDeviceClass.PRESSURE:
-            return 1
+        # if self.device_class == SensorDeviceClass.TEMPERATURE:
+        #    return 1
+        # if self.device_class == SensorDeviceClass.HUMIDITY:
+        #    return 1
+        # if self.device_class == SensorDeviceClass.PRESSURE:
+        #    return 1
         if self.device_class == SensorDeviceClass.WIND_SPEED:
             return 1
         return None
