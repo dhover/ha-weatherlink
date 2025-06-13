@@ -535,7 +535,15 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_unit_of_measurement(self):
-        # Prefer the unit from SENSOR_TYPES, but allow dynamic logic for rain/temperature if needed
+        if self.device_class == "precipitation":
+            # Show mm if HA is metric, else inch
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return UnitOfLength.MILLIMETERS
+            return UnitOfLength.INCHES
+        if self.device_class == "precipitation_intensity":
+            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
+                return f"{UnitOfLength.MILLIMETERS}/h"
+            return f"{UnitOfLength.INCHES}/h"
         if self._attr_unit is not None:
             return self._attr_unit
         # fallback logic if needed
