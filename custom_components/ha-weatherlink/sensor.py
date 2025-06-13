@@ -6,7 +6,7 @@ from .const import DOMAIN
 SENSOR_TYPES = {
     "bar_sea_level": {
         "name": "Barometric Pressure",
-        "device_class": "pressure",
+        "device_class": SensorDeviceClass.PRESSURE,
         "icon": "mdi:gauge",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPressure.INHG,
@@ -20,49 +20,49 @@ SENSOR_TYPES = {
     },
     "bar_absolute": {
         "name": "Absolute Pressure",
-        "device_class": "pressure",
+        "device_class": SensorDeviceClass.PRESSURE,
         "icon": "mdi:gauge",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPressure.INHG,
     },
     "dew_point": {
         "name": "Dew Point",
-        "device_class": "temperature",
+        "device_class": SensorDeviceClass.TEMPERATURE,
         "icon": "mdi:weather-fog",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "dew_point_in": {
         "name": "Indoor Dew Point",
-        "device_class": "temperature",
+        "device_class": SensorDeviceClass.TEMPERATURE,
         "icon": "mdi:weather-fog",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "heat_index": {
         "name": "Heat Index",
-        "device_class": "temperature",
+        "device_class": SensorDeviceClass.TEMPERATURE,
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "heat_index_in": {
         "name": "Indoor Heat Index",
-        "device_class": "temperature",
+        "device_class": SensorDeviceClass.TEMPERATURE,
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "hum": {
         "name": "Outdoor Humidity",
-        "device_class": "humidity",
+        "device_class": SensorDeviceClass.HUMIDITY,
         "icon": "mdi:water-percent",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
     },
     "hum_in": {
         "name": "Indoor Humidity",
-        "device_class": "humidity",
+        "device_class": SensorDeviceClass.HUMIDITY,
         "icon": "mdi:water-percent",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
@@ -324,28 +324,28 @@ SENSOR_TYPES = {
         "device_class": "temperature",
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "temp_in": {
         "name": "Indoor Temperature",
         "device_class": "temperature",
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "thsw_index": {
         "name": "THSW Index",
         "device_class": "temperature",
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "thw_index": {
         "name": "THW Index",
         "device_class": "temperature",
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "trans_battery_flag": {
         "name": "Transmitter Battery Flag",
@@ -366,7 +366,7 @@ SENSOR_TYPES = {
         "device_class": "temperature",
         "icon": "mdi:thermometer-water",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
     "wind_speed_last": {
         "name": "Wind Speed",
@@ -457,7 +457,7 @@ SENSOR_TYPES = {
         "device_class": "temperature",
         "icon": "mdi:snowflake",
         "state_class": SensorStateClass.MEASUREMENT,
-        "unit": UnitOfTemperature.FAHRENHEIT,
+        "unit": UnitOfTemperature.CELCIUS,
     },
 }
 
@@ -535,33 +535,39 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_unit_of_measurement(self):
-        if self.device_class == "precipitation":
-            # Show mm if HA is metric, else inch
+        if self.device_class == SensorDeviceClass.PRECIPITATION:
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return UnitOfLength.MILLIMETERS
             return UnitOfLength.INCHES
-        if self.device_class == "precipitation_intensity":
+        if self.device_class == SensorDeviceClass.PRECIPITATION_INTENSITY:
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
-        if self._attr_unit is not None:
-            return self._attr_unit
-        # fallback logic if needed
+        if self.device_class == SensorDeviceClass.TEMPERATURE:
+            return UnitOfTemperature.FAHRENHEIT
+        if self.device_class == SensorDeviceClass.HUMIDITY:
+            return "%"
+        if self.device_class == SensorDeviceClass.PRESSURE:
+            return UnitOfPressure.INHG
+        if self.device_class == SensorDeviceClass.WIND_SPEED:
+            return UnitOfSpeed.MILES_PER_HOUR
+        if self.device_class in [SensorDeviceClass.PM1, SensorDeviceClass.PM25, SensorDeviceClass.PM10]:
+            return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
         return None
 
     @property
     def suggested_display_precision(self):
-        if self.device_class == "precipitation":
+        if self.device_class == SensorDeviceClass.PRECIPITATION:
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return 1
             return 2
-        if self.device_class == "temperature":
+        if self.device_class == SensorDeviceClass.TEMPERATURE:
             return 1
-        if self.device_class == "humidity":
+        if self.device_class == SensorDeviceClass.HUMIDITY:
             return 1
-        if self.device_class == "pressure":
+        if self.device_class == SensorDeviceClass.PRESSURE:
             return 1
-        if self.device_class == "wind_speed":
+        if self.device_class == SensorDeviceClass.WIND_SPEED:
             return 1
         return None
 
@@ -581,38 +587,36 @@ class WeatherlinkSensor(SensorEntity):
 
     @property
     def native_unit_of_measurement(self):
-        if self.device_class == "precipitation":
+        if self.device_class == SensorDeviceClass.PRECIPITATION:
             # Show mm if HA is metric, else inch
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return UnitOfLength.MILLIMETERS
             return UnitOfLength.INCHES
-        if self.device_class == "precipitation_intensity":
+        if self.device_class == SensorDeviceClass.PRECIPITATION_INTENSITY:
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
-        if self.device_class == "temperature":
+        if self.device_class == SensorDeviceClass.TEMPERATURE:
             return UnitOfTemperature.FAHRENHEIT
-        if self.device_class == "humidity":
+        if self.device_class == SensorDeviceClass.HUMIDITY:
             return "%"
-        if self.device_class == "pressure":
+        if self.device_class == SensorDeviceClass.PRESSURE:
             return UnitOfPressure.INHG
-        if self.device_class == "wind_speed":
+        if self.device_class == SensorDeviceClass.WIND_SPEED:
             return UnitOfSpeed.MILES_PER_HOUR
-        if self.device_class in ["pm1", "pm25", "pm10"]:
+        if self.device_class in [SensorDeviceClass.PM1, SensorDeviceClass.PM25, SensorDeviceClass.PM10]:
             return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
         return None
 
     @property
     def native_value(self):
         if self._key in self._data:
-            # Special handling for all rain count fields
             if self._key in rain_count_keys:
                 rain_size = self._data.get("rain_size", 1)
                 count = self._data[self._key]
                 to_mm = self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS
                 return calculate_rain_amount(count, rain_size, to_mm)
-            # Convert temperature sensors to Celsius
-            if self.device_class == "temperature":
+            if self.device_class == SensorDeviceClass.TEMPERATURE:
                 return round(fahrenheit_to_celsius(self._data[self._key]), 1)
             return self._data[self._key]
         return None
