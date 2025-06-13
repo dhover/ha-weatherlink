@@ -359,7 +359,7 @@ SENSOR_TYPES = {
         "icon": "mdi:radio-tower",
         "state_class": None,
         "unit": None,
-        "entity_category": None,
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "solar_rad": {
         "name": "Solar Radiation",
@@ -407,7 +407,7 @@ SENSOR_TYPES = {
         "icon": "mdi:battery-alert",
         "state_class": None,
         "unit": None,
-        "entity_category": None,
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "uv_index": {
         "name": "UV Index",
@@ -622,7 +622,18 @@ class WeatherlinkSensor(SensorEntity):
     def device_info(self):
         # Each condition object gets its own device
         device_id = self._device_id or self.coordinator._host
-        name = f"Weatherlink Device {device_id}"
+        data_structure_type = data.get("data_structure_type", 0)
+        if data_structure_type == 1:
+            name = f"ISS {device_id}"
+        elif data_structure_type == 3:
+            name = f"Baro Inside {device_id}"
+        elif data_structure_type == 4:
+            name = f"Weatherlink Inside {device_id}"
+        elif data_structure_type == 6:
+            name = f"Airlink {device_id}"
+        else:
+            name = f"Weatherlink Device {device_id}"
+
         return {
             "identifiers": {(DOMAIN, device_id)},
             "name": name,
