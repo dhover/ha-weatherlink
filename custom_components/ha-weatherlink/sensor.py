@@ -69,8 +69,8 @@ SENSOR_TYPES = {
     },
     "last_report_time": {
         "name": "Time Last Report",
-        "device_class": None,
-        "icon": None,
+        "device_class": SensorDeviceClass.TIMESTAMP,
+        "icon": "mdi:clock",
         "state_class": None,
         "unit": None,
     },
@@ -534,27 +534,13 @@ class WeatherlinkSensor(SensorEntity):
         return self._attr_state_class
 
     @property
-    def native_unit_of_measurement(self):
-        if self.device_class == SensorDeviceClass.PRECIPITATION:
-            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return UnitOfLength.MILLIMETERS
-            return UnitOfLength.INCHES
-        if self.device_class == SensorDeviceClass.PRECIPITATION_INTENSITY:
-            if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
-                return f"{UnitOfLength.MILLIMETERS}/h"
-            return f"{UnitOfLength.INCHES}/h"
-        if self.device_class == SensorDeviceClass.WIND_SPEED:
-            return UnitOfSpeed.MILES_PER_HOUR
-        return None
-
-    @property
     def suggested_display_precision(self):
         if self.device_class == SensorDeviceClass.PRECIPITATION:
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return 1
             return 2
-        # if self.device_class == SensorDeviceClass.TEMPERATURE:
-        #    return 1
+        if self.device_class in [SensorDeviceClass.PM1, SensorDeviceClass.PM25, SensorDeviceClass.PM10]:
+            return 1
         # if self.device_class == SensorDeviceClass.HUMIDITY:
         #    return 1
         # if self.device_class == SensorDeviceClass.PRESSURE:
@@ -580,7 +566,6 @@ class WeatherlinkSensor(SensorEntity):
     @property
     def native_unit_of_measurement(self):
         if self.device_class == SensorDeviceClass.PRECIPITATION:
-            # Show mm if HA is metric, else inch
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return UnitOfLength.MILLIMETERS
             return UnitOfLength.INCHES
@@ -588,8 +573,6 @@ class WeatherlinkSensor(SensorEntity):
             if self.hass and self.hass.config.units.length_unit == UnitOfLength.MILLIMETERS:
                 return f"{UnitOfLength.MILLIMETERS}/h"
             return f"{UnitOfLength.INCHES}/h"
-        # if self.device_class == SensorDeviceClass.WIND_SPEED:
-        #    return UnitOfSpeed.MILES_PER_HOUR
         return self._attr_unit
 
     @property
@@ -602,6 +585,8 @@ class WeatherlinkSensor(SensorEntity):
                 return calculate_rain_amount(count, rain_size, to_mm)
             if self.device_class == SensorDeviceClass.TEMPERATURE:
                 return round(fahrenheit_to_celsius(self._data[self._key]), 1)
+            if self.device_class == SensorDeviceClass.TIMESTAMP:
+                return datetime.fromtimestamp(self._data[self._key])
             return self._data[self._key]
         return None
 
