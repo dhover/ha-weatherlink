@@ -311,7 +311,7 @@ SENSOR_TYPES = {
         "icon": "mdi:cup-water",
         "state_class": None,
         "unit": None,
-        "entity_category": None,
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "rain_storm": {
         "name": "Current Storm Rainfall",
@@ -623,14 +623,15 @@ class WeatherlinkSensor(SensorEntity):
         # Each condition object gets its own device
         device_id = self._device_id or self.coordinator._host
         data_structure_type = self._data.get("data_structure_type", 0)
+        txid = self._data.get("txid", 0)
         if data_structure_type == 1:
-            name = f"ISS {device_id}"
+            name = f"ISS{txid}"
         elif data_structure_type == 3:
-            name = f"Baro Inside {device_id}"
+            name = f"WLL Baro"
         elif data_structure_type == 4:
-            name = f"Weatherlink Inside {device_id}"
+            name = f"WLL Temp/Hum"
         elif data_structure_type == 6:
-            name = f"Airlink {device_id}"
+            name = f"Airlink"
         else:
             name = f"Weatherlink Device {device_id}"
 
