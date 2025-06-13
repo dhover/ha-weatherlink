@@ -1,8 +1,12 @@
 from homeassistant.const import UnitOfLength, UnitOfTemperature, UnitOfPressure, UnitOfSpeed, CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 from homeassistant.components.sensor import SensorStateClass, SensorDeviceClass, SensorEntity
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from datetime import datetime, timezone
 from .const import DOMAIN
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 SENSOR_TYPES = {
     "bar_sea_level": {
@@ -11,6 +15,7 @@ SENSOR_TYPES = {
         "icon": "mdi:gauge",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPressure.INHG,
+        "entity_category": None,
     },
     "bar_trend": {
         "name": "Barometric Trend",
@@ -18,6 +23,7 @@ SENSOR_TYPES = {
         "icon": "mdi:trending-up",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "bar_absolute": {
         "name": "Absolute Pressure",
@@ -25,6 +31,7 @@ SENSOR_TYPES = {
         "icon": "mdi:gauge",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfPressure.INHG,
+        "entity_category": None,
     },
     "dew_point": {
         "name": "Dew Point",
@@ -32,6 +39,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-fog",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "dew_point_in": {
         "name": "Indoor Dew Point",
@@ -39,6 +47,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-fog",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "heat_index": {
         "name": "Heat Index",
@@ -46,6 +55,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "heat_index_in": {
         "name": "Indoor Heat Index",
@@ -53,6 +63,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "hum": {
         "name": "Outdoor Humidity",
@@ -60,6 +71,7 @@ SENSOR_TYPES = {
         "icon": "mdi:water-percent",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": None,
     },
     "hum_in": {
         "name": "Indoor Humidity",
@@ -67,6 +79,7 @@ SENSOR_TYPES = {
         "icon": "mdi:water-percent",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": None,
     },
     "last_report_time": {
         "name": "Time Last Report",
@@ -74,6 +87,7 @@ SENSOR_TYPES = {
         "icon": "mdi:clock",
         "state_class": None,
         "unit": None,
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "pm_1_last": {
         "name": "PM 1.0 Last",
@@ -81,6 +95,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5_last": {
         "name": "PM 2.5 Last",
@@ -88,6 +103,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10_last": {
         "name": "PM 10 Last",
@@ -95,6 +111,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_1": {
         "name": "PM 1.0",
@@ -102,6 +119,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5": {
         "name": "PM 2.5",
@@ -109,6 +127,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5_last_1_hour": {
         "name": "PM 2.5 Last 1h",
@@ -116,6 +135,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5_last_3_hours": {
         "name": "PM 2.5 Last 3h",
@@ -123,6 +143,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5_last_24_hours": {
         "name": "PM 2.5 Last 24h",
@@ -130,6 +151,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_2p5_nowcast": {
         "name": "PM 2.5 Nowcast",
@@ -137,6 +159,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10": {
         "name": "PM 10",
@@ -144,6 +167,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10_last_1_hour": {
         "name": "PM 10 Last 1h",
@@ -151,6 +175,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10_last_3_hours": {
         "name": "PM 10 Last 3h",
@@ -158,6 +183,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10_last_24_hours": {
         "name": "PM 10 Last 24h",
@@ -165,6 +191,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pm_10_nowcast": {
         "name": "PM 10 Nowcast",
@@ -172,6 +199,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+        "entity_category": None,
     },
     "pct_pm_data_last_1_hour": {
         "name": "PM Data Last 1h",
@@ -179,6 +207,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "pct_pm_data_last_3_hours": {
         "name": "PM Data Last 3h",
@@ -186,6 +215,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "pct_pm_data_last_24_hours": {
         "name": "PM Data Last 24h",
@@ -193,6 +223,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "pct_pm_data_nowcast": {
         "name": "PM Data Nowcast",
@@ -200,6 +231,7 @@ SENSOR_TYPES = {
         "icon": None,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "%",
+        "entity_category": EntityCategory.DIAGNOSTIC,
     },
     "rainfall_daily": {
         "name": "Daily Rainfall",
@@ -207,6 +239,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rainfall_last_15_min": {
         "name": "Rainfall Last 15 Min",
@@ -214,6 +247,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rainfall_last_60_min": {
         "name": "Rainfall Last 60 Min",
@@ -221,6 +255,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rainfall_last_24_hr": {
         "name": "Rainfall Last 24 Hr",
@@ -228,6 +263,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rainfall_monthly": {
         "name": "Monthly Rainfall",
@@ -235,6 +271,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rainfall_year": {
         "name": "Yearly Rainfall",
@@ -242,6 +279,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-rainy",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rain_rate_hi": {
         "name": "Rain Rate High",
@@ -249,6 +287,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-pouring",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": f"{UnitOfLength.INCHES}/h",
+        "entity_category": None,
     },
     "rain_rate_hi_last_15_min": {
         "name": "Rain Rate Hi Last 15 Min",
@@ -256,6 +295,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-pouring",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": f"{UnitOfLength.INCHES}/h",
+        "entity_category": None,
     },
     "rain_rate_last": {
         "name": "Rain Rate Last",
@@ -263,6 +303,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-pouring",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": f"{UnitOfLength.INCHES}/h",
+        "entity_category": None,
     },
     "rain_size": {
         "name": "Rain Collector Size",
@@ -270,6 +311,7 @@ SENSOR_TYPES = {
         "icon": "mdi:cup-water",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "rain_storm": {
         "name": "Current Storm Rainfall",
@@ -277,6 +319,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-pouring",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rain_storm_last": {
         "name": "Last Storm Rainfall",
@@ -284,6 +327,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-pouring",
         "state_class": SensorStateClass.TOTAL,
         "unit": UnitOfLength.INCHES,
+        "entity_category": None,
     },
     "rain_storm_last_end_at": {
         "name": "Last Rain Storm End",
@@ -291,6 +335,7 @@ SENSOR_TYPES = {
         "icon": "mdi:clock-end",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "rain_storm_last_start_at": {
         "name": "Last Rain Storm Start",
@@ -298,6 +343,7 @@ SENSOR_TYPES = {
         "icon": "mdi:clock-start",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "rain_storm_start_at": {
         "name": "Rain Storm Start",
@@ -305,6 +351,7 @@ SENSOR_TYPES = {
         "icon": "mdi:clock-start",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "rx_state": {
         "name": "Receiver State",
@@ -312,6 +359,7 @@ SENSOR_TYPES = {
         "icon": "mdi:radio-tower",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "solar_rad": {
         "name": "Solar Radiation",
@@ -319,6 +367,7 @@ SENSOR_TYPES = {
         "icon": "mdi:white-balance-sunny",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": "W/m²",
+        "entity_category": None,
     },
     "temp": {
         "name": "Outdoor Temperature",
@@ -326,6 +375,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "temp_in": {
         "name": "Indoor Temperature",
@@ -333,6 +383,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "thsw_index": {
         "name": "THSW Index",
@@ -340,6 +391,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "thw_index": {
         "name": "THW Index",
@@ -347,6 +399,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "trans_battery_flag": {
         "name": "Transmitter Battery Flag",
@@ -354,6 +407,7 @@ SENSOR_TYPES = {
         "icon": "mdi:battery-alert",
         "state_class": None,
         "unit": None,
+        "entity_category": None,
     },
     "uv_index": {
         "name": "UV Index",
@@ -361,6 +415,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-sunny-alert",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": None,
+        "entity_category": None,
     },
     "wet_bulb": {
         "name": "Wet Bulb",
@@ -368,6 +423,7 @@ SENSOR_TYPES = {
         "icon": "mdi:thermometer-water",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
     "wind_speed_last": {
         "name": "Wind Speed",
@@ -375,6 +431,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_last": {
         "name": "Wind Direction",
@@ -382,6 +439,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_speed_avg_last_1_min": {
         "name": "Wind Speed Avg 1 Min",
@@ -389,6 +447,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_scalar_avg_last_1_min": {
         "name": "Wind Dir Scalar Avg 1 Min",
@@ -396,6 +455,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_speed_avg_last_2_min": {
         "name": "Wind Speed Avg 2 Min",
@@ -403,6 +463,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_scalar_avg_last_2_min": {
         "name": "Wind Dir Scalar Avg 2 Min",
@@ -410,6 +471,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_speed_hi_last_2_min": {
         "name": "Wind Speed Hi 2 Min",
@@ -417,6 +479,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_at_hi_speed_last_2_min": {
         "name": "Wind Dir at Hi Speed 2 Min",
@@ -424,6 +487,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_speed_avg_last_10_min": {
         "name": "Wind Speed Avg 10 Min",
@@ -431,6 +495,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_scalar_avg_last_10_min": {
         "name": "Wind Dir Scalar Avg 10 Min",
@@ -438,6 +503,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_speed_hi_last_10_min": {
         "name": "Wind Speed Hi 10 Min",
@@ -445,6 +511,7 @@ SENSOR_TYPES = {
         "icon": "mdi:weather-windy",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfSpeed.MILES_PER_HOUR,
+        "entity_category": None,
     },
     "wind_dir_at_hi_speed_last_10_min": {
         "name": "Wind Dir at Hi Speed 10 Min",
@@ -452,6 +519,7 @@ SENSOR_TYPES = {
         "icon": "mdi:compass",
         "state_class": None,
         "unit": "°",
+        "entity_category": None,
     },
     "wind_chill": {
         "name": "Wind Chill",
@@ -459,6 +527,7 @@ SENSOR_TYPES = {
         "icon": "mdi:snowflake",
         "state_class": SensorStateClass.MEASUREMENT,
         "unit": UnitOfTemperature.CELSIUS,
+        "entity_category": None,
     },
 }
 
@@ -484,10 +553,8 @@ async def async_setup_entry(hass, entry, async_add_entities):
         or "data" not in coordinator.data
         or "conditions" not in coordinator.data["data"]
     ):
-        import logging
-        logging.getLogger(__name__).warning(
-            "Weatherlink API did not return 'data.conditions'. Data: %s", coordinator.data
-        )
+        _LOGGER.warning(
+            "Weatherlink API did not return 'data.conditions'. Data: %s", coordinator.data)
         return
 
     conditions = coordinator.data["data"]["conditions"]
@@ -520,6 +587,7 @@ class WeatherlinkSensor(SensorEntity):
         self._attr_icon = sensor_info.get("icon", "mdi:cloud")
         self._attr_state_class = sensor_info.get("state_class")
         self._attr_unit = sensor_info.get("unit")
+        self._attr_entity_category = sensor_info.get("entity_category")
 
     @property
     def unique_id(self):
