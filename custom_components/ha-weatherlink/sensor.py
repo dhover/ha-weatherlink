@@ -331,7 +331,7 @@ SENSOR_TYPES = {
     },
     "rain_storm_last_end_at": {
         "name": "Last Rain Storm End",
-        "device_class": None,
+        "device_class": SensorDeviceClass.TIMESTAMP,
         "icon": "mdi:clock-end",
         "state_class": None,
         "unit": None,
@@ -339,7 +339,7 @@ SENSOR_TYPES = {
     },
     "rain_storm_last_start_at": {
         "name": "Last Rain Storm Start",
-        "device_class": None,
+        "device_class": SensorDeviceClass.TIMESTAMP,
         "icon": "mdi:clock-start",
         "state_class": None,
         "unit": None,
